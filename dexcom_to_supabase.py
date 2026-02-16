@@ -12,7 +12,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 dexcom = Dexcom(
     username=DEXCOM_USERNAME,
     password=DEXCOM_PASSWORD,
-    ous=True
+    region="ous"
 )
 
 
