@@ -9,7 +9,12 @@ DEXCOM_USERNAME = os.environ["DEXCOM_USERNAME"]
 DEXCOM_PASSWORD = os.environ["DEXCOM_PASSWORD"]
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-dexcom = Dexcom(username=DEXCOM_USERNAME, password=DEXCOM_PASSWORD)
+dexcom = Dexcom(
+    username=DEXCOM_USERNAME,
+    password=DEXCOM_PASSWORD,
+    ous=True
+)
+
 
 def main():
     print("Starte Dexcom Sync")
