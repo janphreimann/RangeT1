@@ -1,5 +1,5 @@
 import os
-from datetime import timezone
+from datetime import datetime, timezone
 from supabase import create_client, Client
 from pydexcom import Dexcom
 
@@ -26,7 +26,7 @@ def main():
         return
 
     row = {
-        "reading_time": bg.time.replace(tzinfo=timezone.utc).isoformat(),
+        "reading_time": datetime.now(timezone.utc).isoformat(),
         "glucose_mgdl": int(bg.value),
         "glucose_mmol": float(bg.mmol_l),
         "trend_description": bg.trend_description,
