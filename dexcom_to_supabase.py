@@ -16,26 +16,56 @@ dexcom = Dexcom(
 )
 
 
+def get_last_saved_value():
+    res = (
+        supabase.table("dexcom_glucose_logs")
+        .select("*")
+        .order("reading_time", desc=True)
+        .limit(1)
+        .execute()
+    )
+    if res.data:
+        return res.data[0]
+    return None
+
+
 def main():
     print("Starte Dexcom Sync")
 
-    bg = dexcom.get_current_glucose_reading()
+    readings = dexcom.get_glucose_readings(max_count=1)
 
-    if bg is None:
-        print("Kein neuer Wert verfügbar")
-        return
+    if readings:
+        bg = readings[0]
+        row = {
+            # echte Messzeit von Dexcom verwenden
+            "reading_time": bg.datetime.isoformat(),
+            "glucose_mgdl": int(bg.value),
+            "glucose_mmol": float(bg.mmol_l),
+            "trend_description": bg.trend_description,
+            "trend_arrow": bg.trend_arrow
+        }
+        print("Dexcom Wert gefunden")
 
-    row = {
-        "reading_time": datetime.now(timezone.utc).isoformat(),
-        "glucose_mgdl": int(bg.value),
-        "glucose_mmol": float(bg.mmol_l),
-        "trend_description": bg.trend_description,
-        "trend_arrow": bg.trend_arrow
-    }
+    else:
+        print("Dexcom liefert keinen Wert → nutze letzten DB Wert")
+
+        last = get_last_saved_value()
+        if not last:
+            print("Noch kein Wert in DB vorhanden → nichts zu speichern")
+            return
+
+        # Wert bleibt gleich, Zeitstempel wird auf 'jetzt' gesetzt (keine Lücke)
+        row = {
+            "reading_time": datetime.now(timezone.utc).isoformat(),
+            "glucose_mgdl": int(last["glucose_mgdl"]),
+            "glucose_mmol": float(last["glucose_mmol"]),
+            "trend_description": last.get("trend_description"),
+            "trend_arrow": last.get("trend_arrow")
+        }
 
     supabase.table("dexcom_glucose_logs").insert(row).execute()
-
     print("Upload erfolgreich:", row)
+
 
 if __name__ == "__main__":
     main()
