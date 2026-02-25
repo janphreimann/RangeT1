@@ -57,6 +57,7 @@ def main():
             "glucose_mmol": float(bg.mmol_l),
             "trend_description": bg.trend_description,
             "trend_arrow": bg.trend_arrow,
+            "user_id": "a4f07f34-075a-4b89-9c0a-db3e466a6ffb",
         }
 
         save_row(row)
@@ -77,6 +78,7 @@ def main():
         "glucose_mmol": float(last["glucose_mmol"]),
         "trend_description": last.get("trend_description"),
         "trend_arrow": last.get("trend_arrow"),
+        "user_id": "a4f07f34-075a-4b89-9c0a-db3e466a6ffb",
     }
 
     save_row(row)
